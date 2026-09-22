@@ -18,6 +18,13 @@ The pods stay `Pending` for a few seconds while the volume is created. Run the `
 
 **Q1.** What do you observe about the pods?
 
+get pods returns the 2 pods with the same prefix note but then a distinct suffix. They are both ready and running. The pods share
+a volume that we can see with the get pvc.
+
+note-65886f65df-f7jmx
+note-65886f65df-qwksh
+
+
 ## 2. Write on one pod, read on the other
 
 Copy the two pod names from the previous command. Run these one at a time, with those names filled in:
@@ -29,6 +36,10 @@ kubectl get pvc
 ```
 
 **Q2.** What do you observe about the note, and about the volumes?
+
+The note got written to by the first pod and then it got read by the second pod
+to get "hello-from-a." They share the same volume as we see when we run get pv.
+It's also persistent.
 
 ## 3. Remove the Deployment
 
@@ -51,6 +62,8 @@ kubectl get pods -l app=note -w
 
 **Q3.** In what order did the pods start, and what are they named?
 
+The note-0 pod started first and then the note-1 pod started second.
+
 ## 5. A different note on each pod
 
 ```bash
@@ -62,6 +75,10 @@ kubectl get pvc
 ```
 
 **Q4.** How does this differ from what you saw in Q2?
+
+This differs as the output just returns the message written by each note individually instead
+of them both being in the volume. This implies they are different volumes. I confirmed
+this by running kubectl get pvc and see a data-note-0 volume and data-note-1.
 
 ## 6. Delete note-0
 
@@ -81,6 +98,11 @@ kubectl get pvc
 ```
 
 **Q5.** After `note-0` was deleted and came back, what stayed the same? How do these volumes differ from the Deployment?
+
+When we cat either note the same data is there. When I did kubectl get pvc, the same volumes are there and they have the same
+age which shows that they were never deleted, only the node was deleted.
+In just a deployment, something could happen where when you start the node back up that the volume has changed as the volumes
+in a deployment aren't stateful.
 
 ## Cleanup
 
